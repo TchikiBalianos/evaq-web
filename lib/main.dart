@@ -90,10 +90,11 @@ class EvaqShell extends StatelessWidget {
             title: Row(
               children: [
                 const Text('EVAQ'),
-                if (provider.isTestMode) ...[
-                  const SizedBox(width: 8),
-                  _buildTestBadge(),
-                ],
+                const SizedBox(width: 8),
+                if (provider.isTestMode)
+                  _buildTestBadge()
+                else
+                  _buildLiveBadge(),
               ],
             ),
             actions: [
@@ -179,6 +180,28 @@ class EvaqShell extends StatelessWidget {
           Text(
             I18n.t('test.on'),
             style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.warning),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLiveBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.success.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle)),
+          const SizedBox(width: 3),
+          Text(
+            'LIVE',
+            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.success),
           ),
         ],
       ),

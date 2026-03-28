@@ -51,33 +51,69 @@ class TestModeBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!isTestMode) return const SizedBox.shrink();
+    if (isTestMode) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        color: AppColors.primaryLight,
+        child: Row(
+          children: [
+            Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)),
+            const SizedBox(width: 6),
+            Text(I18n.t('test.mode'), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primary)),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                scenario,
+                style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+            GestureDetector(
+              onTap: onChangeScenario,
+              child: Text(I18n.t('test.change'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.warning)),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: onToggle,
+              child: Text(I18n.t('test.disable'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.info)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Normal mode banner — allows re-enabling test mode
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      color: AppColors.primaryLight,
+      color: AppColors.success.withValues(alpha: 0.08),
       child: Row(
         children: [
-          Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)),
+          Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle)),
           const SizedBox(width: 6),
-          Text(I18n.t('test.mode'), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primary)),
+          Text(I18n.t('test.normal_mode'), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.success)),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              scenario,
-              style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+              I18n.t('test.real_alerts'),
+              style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
           ),
           GestureDetector(
-            onTap: onChangeScenario,
-            child: Text(I18n.t('test.change'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.warning)),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
             onTap: onToggle,
-            child: Text(I18n.t('test.disable'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.info)),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+              ),
+              child: Text(I18n.t('test.enable'), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.warning)),
+            ),
           ),
         ],
       ),
