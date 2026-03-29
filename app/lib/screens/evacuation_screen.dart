@@ -286,6 +286,15 @@ class _EvacuationScreenState extends State<EvacuationScreen> {
               Text(plan.transport, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white)),
             ]),
           )),
+          Positioned(top: 10, left: 100, child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(6)),
+            child: Row(children: [
+              const Icon(Icons.shield_outlined, size: 10, color: Colors.white),
+              const SizedBox(width: 4),
+              const Text('OFFLINE READY', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5)),
+            ]),
+          )),
           Positioned(bottom: 10, right: 10, child: GestureDetector(
             onTap: () => provider.toggleConflicts(),
             child: Container(

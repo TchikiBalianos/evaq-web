@@ -7,7 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 import { circleGeoJSON } from '@/lib/geo'
 import { useI18n, translateAlertTitle } from '@/lib/i18n'
 import { getEvacuationAdvice, destinationPoint } from '@/lib/evacuation-logic'
-import type { WindData, EvacuationAdvice } from '@/lib/evacuation-logic'
+import { WindData, EvacuationAdvice } from '@/lib/evacuation-logic'
+import { Download, ShieldCheck } from 'lucide-react'
 import { getSavedPlans, savePlan, deletePlan } from '@/lib/saved-plans'
 import type { SavedPlan } from '@/lib/saved-plans'
 import { fetchRouteStops, getStopIcon } from '@/lib/route-stops'
@@ -78,6 +79,9 @@ export function EvacuationMap() {
   const [showConflicts, setShowConflicts] = useState(true)
   const conflictMarkersRef = useRef<maplibregl.Marker[]>([])
   const { t, locale } = useI18n()
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
+  const [isOfflineReady, setIsOfflineReady] = useState(false)
   const { testMode, activeScenario } = useTestMode()
 
   // Fetch alerts
@@ -639,6 +643,54 @@ export function EvacuationMap() {
     return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`
   }
 
+  const handleDownloadArea = async () => {
+    const map = mapRef.current
+    if (!map || isDownloading) return
+
+    setIsDownloading(true)
+    setDownloadProgress(0)
+
+    try {
+      const center = map.getCenter()
+      const zoom = Math.floor(map.getZoom())
+      const levels = [zoom, zoom + 1, zoom + 2]
+      const tiles: string[] = []
+
+      // Calculate a small grid around center
+      for (const z of levels) {
+        if (z > 15) continue
+        const x = Math.floor((center.lng + 180) / 360 * Math.pow(2, z))
+        const y = Math.floor((1 - Math.log(Math.tan(center.lat * Math.PI / 180) + 1 / Math.cos(center.lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, z))
+        
+        for (let dx = -2; dx <= 2; dx++) {
+          for (let dy = -2; dy <= 2; dy++) {
+            tiles.push(`https://tiles.openfreemap.org/data/v3/${z}/${x + dx}/${y + dy}.pbf`)
+          }
+        }
+      }
+
+      let count = 0
+      for (const url of tiles) {
+        try {
+          await fetch(url, { mode: 'no-cors' }) // Trigger service worker cache
+          count++
+          setDownloadProgress(Math.round((count / tiles.length) * 100))
+        } catch { /* skip failed tiles */ }
+      }
+      
+      setIsOfflineReady(true)
+      localStorage.setItem('evaq_map_offline_ready', 'true')
+    } catch (e) {
+      console.error("Download failed", e)
+    } finally {
+      setTimeout(() => setIsDownloading(false), 1000)
+    }
+  }
+
+  useEffect(() => {
+    setIsOfflineReady(localStorage.getItem('evaq_map_offline_ready') === 'true')
+  }, [])
+
   return (
     <>
       <div ref={containerRef} className="w-full h-full" />
@@ -728,6 +780,38 @@ export function EvacuationMap() {
                 >
                   {!userPos ? t('route.need_gps') : t('route.select_destination')}
                 </button>
+
+                {/* Offline Maps Downloader */}
+                <div className="pt-2 border-t border-border mt-2">
+                  <button
+                    onClick={handleDownloadArea}
+                    disabled={isDownloading}
+                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
+                      isOfflineReady 
+                        ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600' 
+                        : 'bg-slate-500/5 border-slate-500/20 text-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${isOfflineReady ? 'bg-emerald-500/10' : 'bg-slate-500/10'}`}>
+                        {isDownloading ? (
+                           <div className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                        ) : (
+                           <Download className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div className="text-left">
+                        <div className="text-[10px] font-black uppercase tracking-widest">
+                          {isOfflineReady ? 'Carte Offline Prête' : 'Zone non téléchargée'}
+                        </div>
+                        <div className="text-[9px] opacity-70">
+                          {isDownloading ? `Téléchargement... ${downloadProgress}%` : 'Rayon de 50km · Zooom 10-14'}
+                        </div>
+                      </div>
+                    </div>
+                    {isOfflineReady && <ShieldCheck className="w-4 h-4" />}
+                  </button>
+                </div>
 
                 {/* Saved plans section */}
                 {savedPlans.length > 0 && (

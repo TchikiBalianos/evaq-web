@@ -114,6 +114,17 @@ class EvaqProvider extends ChangeNotifier {
     _rpgScore = prefs.getInt('rpg_score') ?? -1;
     _locale = prefs.getString('locale') ?? AppLocale.fr;
     _expertMode = prefs.getBool('expert_mode') ?? false;
+    
+    // Load cached conflicts
+    final cachedConflicts = prefs.getStringList('cached_conflicts');
+    if (cachedConflicts != null) {
+      _conflictPoints = cachedConflicts.map((s) {
+        final parts = s.split('|');
+        return ConflictPoint(id: parts[0], title: parts[1], type: parts[2], lat: double.parse(parts[3]), lng: double.parse(parts[4]), fatalities: int.parse(parts[5]), date: parts[6]);
+      }).toList();
+    } else {
+      _initConflictPoints();
+    }
     notifyListeners();
   }
 
@@ -124,6 +135,13 @@ class EvaqProvider extends ChangeNotifier {
       ConflictPoint(id: 'ac-3', title: 'Nanterre — Préfecture', type: 'Explosions', lat: 48.892, lng: 2.215, fatalities: 5, date: '29/03'),
       ConflictPoint(id: 'ac-4', title: 'Rueil-Malmaison', type: 'Violence', lat: 48.876, lng: 2.180, fatalities: 1, date: '27/03'),
     ];
+    _saveConflicts();
+  }
+
+  void _saveConflicts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = _conflictPoints.map((c) => "${c.id}|${c.title}|${c.type}|${c.lat}|${c.lng}|${c.fatalities}|${c.date}").toList();
+    await prefs.setStringList('cached_conflicts', list);
   }
 
   void setLocale(String l) {

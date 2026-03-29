@@ -4,7 +4,7 @@
 const CACHE_NAME = 'evaq-v2'
 const TILE_CACHE = 'evaq-tiles-v1'
 const OFFLINE_URL = '/offline'
-const MAX_TILE_CACHE = 500 // Limiter à 500 tuiles (~50 MB)
+const MAX_TILE_CACHE = 5000 // Limiter à 5000 tuiles (Suffisant pour ~1000km² en zoom 14)
 
 // Installation : mise en cache des ressources critiques
 self.addEventListener('install', (event) => {
