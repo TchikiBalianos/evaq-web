@@ -22,6 +22,8 @@ export default function SENTINELChat() {
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [isSent, setIsSent] = useState(false)
+  const isPremium = typeof window !== 'undefined' ? localStorage.getItem('evaq_is_premium') === 'true' : false
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -74,6 +76,12 @@ export default function SENTINELChat() {
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-tight uppercase">SENTINEL AI</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-blue-500/80">Sentinel Protocol</span>
+                {isPremium && (
+                  <div className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[8px] font-black text-amber-500 tracking-tighter">PRO</div>
+                )}
+              </div>
               <div className="flex items-center gap-1.5">
                 <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] text-muted font-medium uppercase tracking-widest">En ligne</span>

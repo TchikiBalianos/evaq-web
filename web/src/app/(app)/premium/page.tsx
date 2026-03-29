@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useI18n } from '@/lib/i18n'
+import SolanaPayModal from '@/components/solana-pay-modal'
+import { Wallet, ShieldCheck, Zap, Globe, Download, History, ChevronRight } from 'lucide-react'
 
 interface PricingCard {
   id: string
@@ -72,6 +74,13 @@ const SUBSCRIPTIONS: PricingCard[] = [
 export default function PremiumPage() {
   const { t } = useI18n()
   const [loading, setLoading] = useState<string | null>(null)
+  const [showSolana, setShowSolana] = useState(false)
+  const [isPremium, setIsPremium] = useState(false)
+
+  // Load premium state from localStorage (Mock)
+  useEffect(() => {
+    setIsPremium(localStorage.getItem('evaq_is_premium') === 'true')
+  }, [])
 
   const handleCheckout = useCallback(async (productId: string) => {
     setLoading(productId)
@@ -99,6 +108,12 @@ export default function PremiumPage() {
       }
     } catch {}
   }, [])
+
+  const handleSolanaSuccess = () => {
+    setIsPremium(true)
+    localStorage.setItem('evaq_is_premium', 'true')
+    setShowSolana(false)
+  }
 
   return (
     <div className="space-y-6 pb-8">
@@ -187,24 +202,80 @@ export default function PremiumPage() {
         </div>
       </div>
 
-      {/* Solana Mock Payment (ISO Mobile) */}
-      <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-purple-500/10 flex items-center justify-center text-purple-500 font-bold">
-            ◎
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold">{t('premium.payment_solana') || 'Payer avec Solana (Web3)'}</h3>
-            <p className="text-[10px] text-muted">Abonnement ou pack directisé via la blockchain</p>
+      {/* Solana & Web3 Section */}
+      <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-br from-slate-900 via-slate-900 to-purple-900/20 p-6 space-y-4 relative overflow-hidden shadow-2xl">
+        {/* Glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full" />
+        
+        <div className="flex items-start justify-between relative z-10">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-white/5 border border-white/10">
+                <Wallet className="w-4 h-4 text-purple-400" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-purple-400/80">Solana Pay Protocol</span>
+            </div>
+            <h3 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none pt-1">
+              {isPremium ? 'Accès Débloqué ◎' : 'Upgrade Web3 Premium'}
+            </h3>
+            <p className="text-[10px] text-slate-400 font-medium tracking-tight">
+              Payez en SOL/USDC pour un anonymat total et une activation instantanée sur la blockchain.
+            </p>
           </div>
         </div>
-        <button
-          onClick={() => alert("Connexion Wallet Solana Mockée")}
-          className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors"
-        >
-          Connecter Phantom / Solflare
-        </button>
+
+        {isPremium ? (
+          <div className="grid grid-cols-2 gap-2">
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <div className="text-[10px] font-bold text-white uppercase tracking-wider">SENTINEL AI Pro</div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
+              <Download className="w-5 h-5 text-blue-500" />
+              <div className="text-[10px] font-bold text-white uppercase tracking-wider">Cartes Offline</div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
+               {[
+                 { label: 'SENTINEL PRO', icon: Zap, color: 'text-yellow-500' },
+                 { label: 'GLOBAL MAPS', icon: Globe, color: 'text-blue-500' },
+                 { label: 'OFFLINE MODE', icon: Download, color: 'text-emerald-500' },
+               ].map((feat, i) => (
+                 <div key={i} className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                   <feat.icon className={`w-3 h-3 ${feat.color}`} />
+                   <span className="text-[9px] font-black text-white/70 uppercase tracking-tighter">{feat.label}</span>
+                 </div>
+               ))}
+            </div>
+            
+            <button
+              onClick={() => setShowSolana(true)}
+              className="w-full h-12 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm transition-all shadow-lg shadow-purple-600/30 flex items-center justify-center gap-3 active:scale-95"
+            >
+              <div className="text-lg">◎</div> PAYER 0.25 SOL <ChevronRight className="w-4 h-4 opacity-50" />
+            </button>
+          </div>
+        )}
+
+        <div className="pt-2 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 opacity-40">
+            <History className="w-3 h-3 text-slate-400" />
+            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Powered by Solana Decentralized Finance</span>
+          </div>
+          <ShieldCheck className="w-4 h-4 text-emerald-500/40" />
+        </div>
       </div>
+
+      {showSolana && (
+        <SolanaPayModal 
+          amountSol="0.25" 
+          label="EVAQ Lifetime Alpha Pass"
+          onClose={() => setShowSolana(false)}
+          onSuccess={handleSolanaSuccess}
+        />
+      )}
 
       {/* Manage subscription */}
       <button

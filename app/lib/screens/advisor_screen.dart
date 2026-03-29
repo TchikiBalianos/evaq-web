@@ -95,18 +95,32 @@ class _AdvisorScreenState extends State<AdvisorScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('SENTINEL AI', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
-            Row(
-              children: [
-                Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
-                const SizedBox(width: 4),
-                const Text('EN LIGNE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1, color: AppColors.textMuted)),
-              ],
-            ),
-          ],
+        title: Consumer<EvaqProvider>(
+          builder: (context, provider, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text('SENTINEL AI', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                  if (provider.isPremium) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(color: Colors.amber.withValues(alpha: 0.1), border: Border.all(color: Colors.amber.withValues(alpha: 0.3)), borderRadius: BorderRadius.circular(4)),
+                      child: const Text('PRO', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.amber)),
+                    ),
+                  ],
+                ],
+              ),
+              Row(
+                children: [
+                  Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                  const SizedBox(width: 4),
+                  const Text('EN LIGNE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1, color: AppColors.textMuted)),
+                ],
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.info_outline, size: 20)),

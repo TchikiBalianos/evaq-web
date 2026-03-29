@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/evaq_provider.dart';
 import '../utils/constants.dart';
 import '../utils/i18n.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -388,7 +389,28 @@ class _PaymentSheetState extends State<_PaymentSheet> {
 
   void _processPayment() async {
     setState(() => _isProcessing = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) { setState(() => _isProcessing = false); widget.onSuccess(); }
+    
+    if (_paymentMethod == 1) {
+      // Solana Pay Deep Link
+      final String solanaUri = "solana:Evaq8m1Xj7p2H8v5G4YvA9zX7p2H8v5G4YvA9zX7p?amount=${widget.selectedPlan == 0 ? '0.035' : '0.21'}&label=EVAQ%20Premium";
+      final Uri uri = Uri.parse(solanaUri);
+      
+      try {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          // Fallback if no wallet app
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Aucun portefeuille Solana (Phantom/Solflare) détecté.")));
+        }
+      } catch (e) {
+        debugPrint("Error launching Solana wallet: $e");
+      }
+    }
+
+    await Future.delayed(const Duration(seconds: 4)); // Simulating confirmation
+    if (mounted) { 
+      setState(() => _isProcessing = false); 
+      widget.onSuccess(); 
+    }
   }
 }

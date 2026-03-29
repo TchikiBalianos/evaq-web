@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-import '../models/alert_model.dart';
-import '../models/kit_model.dart';
 import '../utils/i18n.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ConflictPoint {
   final String id;
@@ -85,24 +83,38 @@ class EvaqProvider extends ChangeNotifier {
   // RPG quiz
   int _rpgScore = -1;
   int get rpgScore => _rpgScore;
-  void setRpgScore(int s) {
+  void setRpgScore(int s) async {
     _rpgScore = s;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('rpg_score', s);
     notifyListeners();
   }
 
   // Alert mode (sage/expert)
   bool _expertMode = false;
   bool get expertMode => _expertMode;
-  void toggleExpertMode() {
+  void toggleExpertMode() async {
     _expertMode = !_expertMode;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('expert_mode', _expertMode);
     notifyListeners();
   }
 
   EvaqProvider() {
+    _initPersistence();
     _loadScenarioAlerts();
     _initKit();
     _initEvacuationPlans();
     _initConflictPoints();
+  }
+
+  Future<void> _initPersistence() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isPremium = prefs.getBool('is_premium') ?? false;
+    _rpgScore = prefs.getInt('rpg_score') ?? -1;
+    _locale = prefs.getString('locale') ?? AppLocale.fr;
+    _expertMode = prefs.getBool('expert_mode') ?? false;
+    notifyListeners();
   }
 
   void _initConflictPoints() {
@@ -534,8 +546,10 @@ class EvaqProvider extends ChangeNotifier {
     }
   }
 
-  void setPremium(bool value) {
+  void setPremium(bool value) async {
     _isPremium = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_premium', value);
     notifyListeners();
   }
 
