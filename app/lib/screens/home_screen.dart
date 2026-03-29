@@ -7,6 +7,8 @@ import '../widgets/defcon_card.dart';
 import '../widgets/alert_card.dart';
 import '../widgets/common_widgets.dart';
 import 'alert_detail_screen.dart';
+import 'advisor_screen.dart';
+import 'neighborhood_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -71,11 +73,12 @@ class HomeScreen extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
-                    childAspectRatio: 1.8,
+                    childAspectRatio: 1.6,
                     children: [
                       ActionButton(emoji: '⚡', label: I18n.t('dashboard.view_alerts'), onTap: () => provider.setSelectedTab(1)),
+                      ActionButton(emoji: '🤖', label: 'SENTINEL AI', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvisorScreen()))),
                       ActionButton(emoji: '🌍', label: I18n.t('dashboard.evacuation_plan'), onTap: () => provider.setSelectedTab(2)),
-                      ActionButton(emoji: '🤝', label: I18n.t('dashboard.neighborhood'), onTap: () => provider.setSelectedTab(5)), // New tab
+                      ActionButton(emoji: '🤝', label: I18n.t('dashboard.neighborhood'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NeighborhoodScreen()))),
                       ActionButton(emoji: '🎒', label: I18n.t('dashboard.my_kit'), onTap: () => provider.setSelectedTab(3)),
                       ActionButton(emoji: '⭐', label: I18n.t('dashboard.premium'), onTap: () => provider.setSelectedTab(4)),
                     ],

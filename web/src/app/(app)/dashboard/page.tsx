@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { DashboardClient } from '@/components/dashboard-client'
 import { PushSubscribe } from '@/components/push-subscribe'
 import { useI18n } from '@/lib/i18n'
+import { Bot, MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getRecommendedItems, computePreparationScore } from '@/lib/kit-knowledge'
 
@@ -34,8 +35,8 @@ export default function DashboardPage() {
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[
           { href: '/alertes', labelKey: 'dashboard.view_alerts', icon: '⚡' },
-          { href: '/plan-fuite', labelKey: 'dashboard.evacuation_plan', icon: '🗺' },
-          { href: '/neighborhood', labelKey: 'dashboard.neighborhood', icon: '🤝' },
+          { href: '/advisor', labelKey: 'Sentinel AI', icon: <Bot className="w-6 h-6 text-blue-600" /> },
+          { href: '/neighborhood', labelKey: 'dashboard.neighborhood', icon: <MessageSquare className="w-6 h-6 text-emerald-500" /> },
           { href: '/kit', labelKey: 'dashboard.my_kit', icon: '🎒' },
           { href: '/premium', labelKey: 'dashboard.premium', icon: '⭐' },
         ].map(({ href, labelKey, icon }) => (
@@ -47,7 +48,7 @@ export default function DashboardPage() {
             <span className="text-2xl" role="img" aria-hidden>
               {icon}
             </span>
-            {t(labelKey)}
+            {labelKey.includes('.') ? t(labelKey) : labelKey}
           </a>
         ))}
       </section>

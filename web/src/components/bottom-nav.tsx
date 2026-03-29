@@ -2,16 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, AlertTriangle, Map, Users, Backpack, Star, Settings } from 'lucide-react'
+import { Home, AlertTriangle, Map, Users, Backpack, Star, Settings, Bot, MessageSquare } from 'lucide-react'
 
 const navItems = [
-  { name: 'Accueil', href: '/dashboard', icon: Home },
+  { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Alertes', href: '/alertes', icon: AlertTriangle },
-  { name: 'Évacuation', href: '/plan-fuite', icon: Map },
-  { name: 'Cercle', href: '/neighborhood', icon: Users },
-  { name: 'Kit', href: '/kit', icon: Backpack },
-  { name: 'Premium', href: '/premium', icon: Star },
-  { name: 'Réglages', href: '/settings', icon: Settings },
+  { name: 'Sentinel', href: '/advisor', icon: Bot },
+  { name: 'Plan', href: '/plan-fuite', icon: Map },
+  { name: 'Cercle', href: '/neighborhood', icon: MessageSquare },
 ]
 
 export function BottomNav() {
