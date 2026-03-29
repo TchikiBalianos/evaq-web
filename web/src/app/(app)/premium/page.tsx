@@ -187,6 +187,25 @@ export default function PremiumPage() {
         </div>
       </div>
 
+      {/* Solana Mock Payment (ISO Mobile) */}
+      <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded bg-purple-500/10 flex items-center justify-center text-purple-500 font-bold">
+            ◎
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">{t('premium.payment_solana') || 'Payer avec Solana (Web3)'}</h3>
+            <p className="text-[10px] text-muted">Abonnement ou pack directisé via la blockchain</p>
+          </div>
+        </div>
+        <button
+          onClick={() => alert("Connexion Wallet Solana Mockée")}
+          className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors"
+        >
+          Connecter Phantom / Solflare
+        </button>
+      </div>
+
       {/* Manage subscription */}
       <button
         onClick={handlePortal}
