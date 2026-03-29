@@ -31,34 +31,83 @@ class _KitScreenState extends State<KitScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // RPG HUD Header (ISO with PWA)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFF5B21B6)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(16),
+                  color: const Color(0xFF0F172A), // Slate 900
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF1E293B)), // Slate 800
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10)),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('🎒', style: TextStyle(fontSize: 24)),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(I18n.t('kit.title'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white))),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'SURVIVAL LEVEL',
+                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: AppColors.primary.withValues(alpha: 0.8)),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _getRpgProfileLabel(provider.rpgScore).toUpperCase(),
+                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, fontStyle: FontStyle.italic, color: Colors.white, letterSpacing: -0.5),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.bolt, size: 12, color: Colors.amber),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'XP: ${provider.preparationScore * 105} / 10500',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.slate.shade400),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 50, height: 50,
+                              child: CircularProgressIndicator(
+                                value: provider.preparationScore / 100,
+                                strokeWidth: 5,
+                                backgroundColor: const Color(0xFF1E293B),
+                                valueColor: AlwaysStoppedAnimation<Color>(_getRpgProfileColor(provider.rpgScore)),
+                              ),
+                            ),
+                            Text('${provider.preparationScore}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white)),
+                          ],
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Text('$checkedCount / $totalCount ${I18n.t("kit.elements")}', style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.8))),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('GEAR PREPAREDNESS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.slate, letterSpacing: 0.5)),
+                        Text('STEP ${provider.preparationScore ~/ 10} / 10', style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.slate)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
-                        value: totalCount > 0 ? checkedCount / totalCount : 0,
+                        value: provider.preparationScore / 100,
                         minHeight: 6,
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                        backgroundColor: const Color(0xFF1E293B),
+                        valueColor: AlwaysStoppedAnimation<Color>(_getRpgProfileColor(provider.rpgScore)),
                       ),
                     ),
                   ],

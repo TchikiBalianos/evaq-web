@@ -20,6 +20,22 @@ export interface RecommendedItem {
   source: string
 }
 
+export interface SurvivalRank {
+  id: string
+  label_fr: string
+  label_en: string
+  minScore: number
+  color: string
+}
+
+export const SURVIVAL_RANKS: SurvivalRank[] = [
+  { id: 'novice', label_fr: 'NOVICE', label_en: 'NOVICE', minScore: 0, color: '#94a3b8' },
+  { id: 'nomad', label_fr: 'NOMADE', label_en: 'NOMAD', minScore: 25, color: '#3b82f6' },
+  { id: 'guardian', label_fr: 'GARDIEN', label_en: 'GUARDIAN', minScore: 50, color: '#a855f7' },
+  { id: 'survivor', label_fr: 'SURVIVANT', label_en: 'SURVIVOR', minScore: 75, color: '#22c55e' },
+  { id: 'bunker', label_fr: 'BUNKER READY', label_en: 'BUNKER READY', minScore: 95, color: '#f59e0b' },
+]
+
 export const KIT_CATEGORIES: { key: KitCategory; icon: string }[] = [
   { key: 'water', icon: '💧' },
   { key: 'food', icon: '🥫' },
@@ -118,4 +134,8 @@ export function computePreparationScore(
   }
 
   return Math.round((matchedWeight / totalWeight) * 100)
+}
+
+export function getRankForScore(score: number): SurvivalRank {
+  return [...SURVIVAL_RANKS].reverse().find(r => score >= r.minScore) || SURVIVAL_RANKS[0]
 }

@@ -7,8 +7,13 @@ import {
   KIT_CATEGORIES,
   getRecommendedItems,
   computePreparationScore,
+  getRankForScore,
+  SurvivalRank,
 } from '@/lib/kit-knowledge'
 import type { KitCategory, RecommendedItem } from '@/lib/kit-knowledge'
+import RPGQuiz from '@/components/rpg-quiz'
+import { Trophy, ChevronRight, Activity, ShieldCheck, Zap } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useTestMode } from '@/lib/test-mode-context'
 
 interface InventoryItem {
@@ -116,6 +121,14 @@ export default function KitPage() {
   const [formUnit, setFormUnit] = useState('unité')
   const [formExpiry, setFormExpiry] = useState('')
   const [formNotes, setFormNotes] = useState('')
+  const [showQuiz, setShowQuiz] = useState(false)
+  const [rpgScore, setRpgScore] = useState<number | null>(null)
+
+  // Load RPG score from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('evaq_rpg_score')
+    if (saved) setRpgScore(parseInt(saved))
+  }, [])
 
   // Load items from Supabase
   useEffect(() => {
@@ -131,7 +144,7 @@ export default function KitPage() {
   }, [])
 
   // Compute score and missing items whenever items change (derived state)
-  const { score, missing } = useMemo(() => {
+  const { score, missing, rank } = useMemo(() => {
     const recommended = getRecommendedItems([], false, false)
     const s = computePreparationScore(items, recommended)
     const userCategories = new Set(items.map((i) => `${i.category}:${i.title.toLowerCase().slice(0, 10)}`))
@@ -139,7 +152,8 @@ export default function KitPage() {
       const key = `${rec.category}:${rec.title_fr.split('(')[0].trim().toLowerCase().slice(0, 10)}`
       return !userCategories.has(key)
     })
-    return { score: s, missing: missingItems }
+    const rank = getRankForScore(s)
+    return { score: s, missing: missingItems, rank }
   }, [items])
 
   // Animate score changes
@@ -309,6 +323,19 @@ export default function KitPage() {
 
   const activeCategoryIcon = KIT_CATEGORIES.find((c) => c.key === activeCategory)?.icon || ''
 
+  const handleRpgComplete = (score: number) => {
+    setRpgScore(score)
+    localStorage.setItem('evaq_rpg_score', score.toString())
+    setShowQuiz(false)
+  }
+
+  const getRpgProfile = (score: number) => {
+    if (score >= 9) return { label: t('kit.rpg.profile.survivant'), color: 'text-green-500' }
+    if (score >= 6) return { label: t('kit.rpg.profile.preparateur'), color: 'text-blue-500' }
+    if (score >= 3) return { label: t('kit.rpg.profile.initie'), color: 'text-yellow-500' }
+    return { label: t('kit.rpg.profile.novice'), color: 'text-slate-400' }
+  }
+
   return (
     <div className="space-y-4 pb-24 relative">
       <style dangerouslySetInnerHTML={{ __html: `
@@ -386,44 +413,91 @@ export default function KitPage() {
         }
       `}} />
 
-      {/* Header with score ring */}
-      <div className="flex items-center justify-between">
-        <h1 className="font-semibold text-lg">{t('kit.title')}</h1>
-        <div className="flex items-center gap-3">
-          <div
-            className={`relative ${scoreAnimating ? 'score-pulse' : ''}`}
-            style={{ width: 80, height: 80 }}
-          >
-            <svg width="80" height="80" viewBox="0 0 80 80">
+      {/* RPG HUD Header */}
+      <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 overflow-hidden relative shadow-2xl">
+        {/* Glow effect */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl -mr-16 -mt-16 rounded-full" />
+        
+        <div className="flex items-start justify-between relative z-10">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-blue-500/80">Survival Level</span>
+              <div className="h-px w-8 bg-blue-500/30" />
+            </div>
+            <h1 className="text-2xl font-black italic tracking-tighter text-white leading-none">
+              {rank.label_fr}
+            </h1>
+            <div className="flex items-center gap-1.5 pt-1">
+              <Zap className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                XP: {score * 105} / 10500
+              </span>
+            </div>
+          </div>
+          
+          <div className="relative group">
+            <svg width="64" height="64" viewBox="0 0 80 80" className="rotate-[-90deg]">
+              <circle cx="40" cy="40" r={ringRadius} fill="none" stroke="#1e293b" strokeWidth="6" />
               <circle
                 cx="40" cy="40" r={ringRadius}
                 fill="none"
-                stroke="currentColor"
-                strokeWidth="6"
-                className="text-border opacity-30"
-              />
-              <circle
-                cx="40" cy="40" r={ringRadius}
-                fill="none"
-                stroke={scoreColor}
+                stroke={rank.color}
                 strokeWidth="6"
                 strokeLinecap="round"
                 strokeDasharray={ringCircumference}
                 strokeDashoffset={ringOffset}
-                style={{
-                  transition: 'stroke-dashoffset 0.8s ease-out, stroke 0.3s ease',
-                  transform: 'rotate(-90deg)',
-                  transformOrigin: '50% 50%',
-                }}
+                className="transition-all duration-1000 ease-out"
               />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={`font-mono font-bold text-base ${scoreTextClass}`}>{score}%</span>
+            <div className="absolute inset-0 flex items-center justify-center rotate-90">
+               <span className="text-sm font-black text-white">{score}%</span>
             </div>
           </div>
         </div>
+
+        {/* Progress bar */}
+        <div className="mt-6 space-y-1.5">
+          <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-slate-500">
+            <span>Gear preparedness</span>
+            <span>Step {Math.floor(score/10)} / 10</span>
+          </div>
+          <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+            <motion.div 
+               initial={{ width: 0 }}
+               animate={{ width: `${score}%` }}
+               transition={{ duration: 1.5, ease: "easeOut" }}
+               className="h-full"
+               style={{ backgroundColor: rank.color, boxShadow: `0 0 10px ${rank.color}40` }}
+            />
+          </div>
+        </div>
       </div>
-      <p className="text-[10px] text-muted text-right -mt-2">{t('kit.preparation_score')}</p>
+
+      {/* RPG Quiz Card (if not done) */}
+      {!rpgScore ? (
+        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 flex items-center justify-between gap-4 group hover:border-blue-500/40 transition-all cursor-pointer" onClick={() => setShowQuiz(true)}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
+              <Trophy className="w-5 h-5 text-blue-500" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold">{t('kit.rpg_title')}</h3>
+              <p className="text-[10px] text-muted">{t('kit.rpg_subtitle')}</p>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-blue-500/50" />
+        </div>
+      ) : (
+        <div className="px-1 flex items-center justify-between text-[10px] uppercase font-black italic tracking-wider text-slate-400">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-3 h-3 text-yellow-500" />
+            <span>Archetype: <span className={getRpgProfile(rpgScore).color}>{getRpgProfile(rpgScore).label}</span></span>
+          </div>
+          <button onClick={() => setShowQuiz(true)} className="hover:text-white transition-colors">Retake Exam</button>
+        </div>
+      )}
+
+      {showQuiz && <RPGQuiz onComplete={handleRpgComplete} onClose={() => setShowQuiz(false)} />}
 
       {/* Divider */}
       <div className="h-px bg-border/50" />
