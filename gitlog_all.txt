@@ -1,0 +1,4 @@
+04f3d55 chore: restructure into monorepo with apps and pwa web
+40fd6b0 docs: ajout dossier context/ — documentation complete du projet EVAQ
+3b30259 v1.2.1: fix mode test réactivable + alertes réelles en mode normal (GDACS, ReliefWeb, SENTINEL)
+065b16f v1.2.0: carte interactive alertes, i18n 5 langues, RPG kit, packs post-rally, premium Solana, fix UI S9+
