@@ -35,6 +35,7 @@ export default function DashboardPage() {
         {[
           { href: '/alertes', labelKey: 'dashboard.view_alerts', icon: '⚡' },
           { href: '/plan-fuite', labelKey: 'dashboard.evacuation_plan', icon: '🗺' },
+          { href: '/neighborhood', labelKey: 'dashboard.neighborhood', icon: '🤝' },
           { href: '/kit', labelKey: 'dashboard.my_kit', icon: '🎒' },
           { href: '/premium', labelKey: 'dashboard.premium', icon: '⭐' },
         ].map(({ href, labelKey, icon }) => (

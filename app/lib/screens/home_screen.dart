@@ -75,6 +75,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       ActionButton(emoji: '⚡', label: I18n.t('dashboard.view_alerts'), onTap: () => provider.setSelectedTab(1)),
                       ActionButton(emoji: '🌍', label: I18n.t('dashboard.evacuation_plan'), onTap: () => provider.setSelectedTab(2)),
+                      ActionButton(emoji: '🤝', label: I18n.t('dashboard.neighborhood'), onTap: () => provider.setSelectedTab(5)), // New tab
                       ActionButton(emoji: '🎒', label: I18n.t('dashboard.my_kit'), onTap: () => provider.setSelectedTab(3)),
                       ActionButton(emoji: '⭐', label: I18n.t('dashboard.premium'), onTap: () => provider.setSelectedTab(4)),
                     ],

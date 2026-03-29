@@ -565,7 +565,7 @@ export function EvacuationMap() {
       )}
 
       {/* Floating bottom panel */}
-      <div className="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
+      <div className="absolute bottom-24 left-4 right-4 z-20 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto rounded-xl border border-border bg-background/90 backdrop-blur-sm shadow-lg">
           <div className="p-4 space-y-3">
 

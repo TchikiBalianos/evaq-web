@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { haversine } from '@/lib/defcon'
 import { useI18n, translateAlertTitle } from '@/lib/i18n'
@@ -45,6 +46,7 @@ export function AlertsList() {
   const [sortBy, setSortBy] = useState<SortKey>('date')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [userPos, setUserPos] = useState<{ lat: number; lon: number } | null>(null)
+  const router = useRouter()
   const { t, locale } = useI18n()
   const { testMode, activeScenario } = useTestMode()
 
@@ -203,7 +205,7 @@ export function AlertsList() {
                 }`}
               >
                 <button
-                  onClick={() => setExpandedId(isExpanded ? null : alert.id)}
+                  onClick={() => router.push(`/alertes/${alert.id}`)}
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-surface transition-colors"
                 >
                   <span className="text-xl flex-shrink-0">

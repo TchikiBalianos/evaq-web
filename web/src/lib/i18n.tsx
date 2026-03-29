@@ -63,6 +63,8 @@ const fr: Record<string, string> = {
   'nav.evacuation.short': 'Fuite',
   'nav.kit': 'Kit de survie',
   'nav.kit.short': 'Kit',
+  'nav.neighborhood': 'Voisinage',
+  'nav.neighborhood.short': 'Cercle',
 
   // Theme
   'theme.light': 'Clair',
@@ -84,6 +86,7 @@ const fr: Record<string, string> = {
   'dashboard.complete_kit': 'Completez votre kit de survie pour ameliorer votre score.',
   'dashboard.kit_ready': 'Votre kit est complet. Vous etes pret.',
   'dashboard.premium': 'Premium',
+  'dashboard.neighborhood': 'Cercle de Confiance',
 
   // DEFCON messages
   'defcon.5': 'Aucune menace detectee dans votre zone. Tout est calme.',
@@ -340,6 +343,7 @@ const en: Record<string, string> = {
   'dashboard.complete_kit': 'Complete your survival kit to improve your score.',
   'dashboard.kit_ready': 'Your kit is complete. You are ready.',
   'dashboard.premium': 'Premium',
+  'dashboard.neighborhood': 'Cercle de Confiance',
 
   // DEFCON messages
   'defcon.5': 'No threats detected in your area. All clear.',

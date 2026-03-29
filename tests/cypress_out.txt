@@ -1,0 +1,170 @@
+
+Warning: The allowCypressEnv configuration option is enabled. This allows any browser code to read values from Cypress.env(). This is insecure and will be removed in a future major version.
+
+1. Replace Cypress.env() calls with cy.env() (for sensitive values) or Cypress.expose() (for public configuration)
+2. Set allowCypressEnv: false in your Cypress configuration to disable Cypress.env()
+
+Learn more: https://on.cypress.io/cypress-env-migration
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.13.0                                                                        │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v20.19.4 (C:\nvm4w\nodejs\node.exe)                                            │
+  │ Specs:          2 found (pwa-advanced.cy.js, flutter-advanced.cy.js)                           │
+  │ Searched:       C:\Projects\Claude_Code\LAB\EVAQ\tests\cypress\e2e\pwa-advanced.cy.js, C:\Proj │
+  │                 ects\Claude_Code\LAB\EVAQ\tests\cypress\e2e\flutter-advanced.cy.js             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  pwa-advanced.cy.js                                                              (1 of 2)
+
+
+  PWA E2E: Navigation et Parcours Utilisateurs
+    1) "before each" hook for "Vérifie le fonctionnement de la barre de navigation (Bottom Bar)"
+
+
+  0 passing (541ms)
+  1 failing
+
+  1) PWA E2E: Navigation et Parcours Utilisateurs
+       "before each" hook for "Vérifie le fonctionnement de la barre de navigation (Bottom Bar)":
+     CypressError: `cy.visit()` failed trying to load:
+
+https://evaq-web.vercel.app/
+
+The response we received from your web server was:
+
+  > 404: Not Found
+
+This was considered a failure because the status code was not `2xx`.
+
+If you do not want status codes to cause failures pass the option: `failOnStatusCode: false`
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `PWA E2E: Navigation et Parc...`
+      at <unknown> (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:135121:76)
+      at visitFailedByErr (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:134711:12)
+      at <unknown> (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:135104:13)
+      at tryCatcher (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise._settlePromiseFromHandler (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1489:31)
+      at Promise._settlePromise (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1546:18)
+      at Promise._settlePromise0 (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1591:10)
+      at Promise._settlePromises (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1667:18)
+      at _drainQueueStep (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2377:12)
+      at _drainQueue (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2370:9)
+      at Async._drainQueues (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2386:5)
+      at Async.drainQueues (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2256:14)
+  From Your Spec Code:
+      at Context.eval (webpack://tests/./cypress/e2e/pwa-advanced.cy.js:5:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        3                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      2                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     0 seconds                                                                        │
+  │ Spec Ran:     pwa-advanced.cy.js                                                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Projects\Claude_Code\LAB\EVAQ\tests\cypress\screenshots\pwa-advanced.cy.js\PW     (1280x720)
+     A E2E Navigation et Parcours Utilisateurs -- Vérifie le fonctionnement de la bar               
+     re de navigation (Bottom Bar) -- before each hook (failed).png                                 
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  flutter-advanced.cy.js                                                          (2 of 2)
+
+
+  Flutter Web E2E: Smoketest & Navigation par Coordonnées
+    1) "before each" hook for "Initialisation de l'App Flutter (Fluttter Canvas Engine)"
+
+
+  0 passing (435ms)
+  1 failing
+
+  1) Flutter Web E2E: Smoketest & Navigation par Coordonnées
+       "before each" hook for "Initialisation de l'App Flutter (Fluttter Canvas Engine)":
+     CypressError: `cy.visit()` failed trying to load:
+
+https://evaq-app.vercel.app/
+
+The response we received from your web server was:
+
+  > 401: Unauthorized
+
+This was considered a failure because the status code was not `2xx`.
+
+If you do not want status codes to cause failures pass the option: `failOnStatusCode: false`
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Flutter Web E2E: Smoketest ...`
+      at <unknown> (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:135121:76)
+      at visitFailedByErr (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:134711:12)
+      at <unknown> (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:135104:13)
+      at tryCatcher (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise._settlePromiseFromHandler (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1489:31)
+      at Promise._settlePromise (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1546:18)
+      at Promise._settlePromise0 (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1591:10)
+      at Promise._settlePromises (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:1667:18)
+      at _drainQueueStep (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2377:12)
+      at _drainQueue (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2370:9)
+      at Async._drainQueues (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2386:5)
+      at Async.drainQueues (https://evaq-app.vercel.app/__cypress/runner/cypress_runner.js:2256:14)
+  From Your Spec Code:
+      at Context.eval (webpack://tests/./cypress/e2e/flutter-advanced.cy.js:8:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        2                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      1                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     0 seconds                                                                        │
+  │ Spec Ran:     flutter-advanced.cy.js                                                           │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Projects\Claude_Code\LAB\EVAQ\tests\cypress\screenshots\flutter-advanced.cy.j     (1280x720)
+     s\Flutter Web E2E Smoketest & Navigation par Coordonnées -- Initialisation de l'               
+     App Flutter (Fluttter Canvas Engine) -- before each hook (failed).png                          
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  pwa-advanced.cy.js                       545ms        3        -        1        -        2 │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ×  flutter-advanced.cy.js                   440ms        2        -        1        -        1 │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  2 of 2 failed (100%)                     985ms        5        -        2        -        3  
+
