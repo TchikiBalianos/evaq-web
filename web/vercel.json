@@ -1,0 +1,24 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/ingest-gdacs",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/ingest-reliefweb",
+      "schedule": "30 6 * * *"
+    },
+    {
+      "path": "/api/cron/ingest-sentinel",
+      "schedule": "45 6 * * *"
+    },
+    {
+      "path": "/api/cron/send-push",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/kit-expiry",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}

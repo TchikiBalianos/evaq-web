@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   EVAQ Design System — Tailwind v4 CSS theme
+   Supporte 3 modes : system (défaut), light, dark
+───────────────────────────────────────────── */
+
+:root {
+  --background: #ffffff;
+  --foreground: #09090b;
+  --surface: #f4f4f5;
+  --border: #e4e4e7;
+  --muted: #71717a;
+
+  /* Niveaux DEFCON */
+  --defcon-5: #16a34a;   /* Veille    — vert       */
+  --defcon-4: #ca8a04;   /* Attention — jaune      */
+  --defcon-3: #ea580c;   /* Alerte    — orange     */
+  --defcon-2: #dc2626;   /* Danger    — rouge      */
+  --defcon-1: #450a0a;   /* Urgence   — rouge nuit */
+
+  --defcon-5-bg: #f0fdf4;
+  --defcon-4-bg: #fefce8;
+  --defcon-3-bg: #fff7ed;
+  --defcon-2-bg: #fef2f2;
+  --defcon-1-bg: #18181b;
+}
+
+/* Dark : override manuel via data-theme="dark" */
+:root[data-theme="dark"] {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --surface: #18181b;
+  --border: #27272a;
+  --muted: #a1a1aa;
+
+  --defcon-5-bg: #052e16;
+  --defcon-4-bg: #422006;
+  --defcon-3-bg: #431407;
+  --defcon-2-bg: #450a0a;
+  --defcon-1-bg: #09090b;
+}
+
+/* System dark : s'applique sauf si l'utilisateur a forcé "light" */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #09090b;
+    --foreground: #fafafa;
+    --surface: #18181b;
+    --border: #27272a;
+    --muted: #a1a1aa;
+
+    --defcon-5-bg: #052e16;
+    --defcon-4-bg: #422006;
+    --defcon-3-bg: #431407;
+    --defcon-2-bg: #450a0a;
+    --defcon-1-bg: #09090b;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+
+  --color-defcon-5: var(--defcon-5);
+  --color-defcon-4: var(--defcon-4);
+  --color-defcon-3: var(--defcon-3);
+  --color-defcon-2: var(--defcon-2);
+  --color-defcon-1: var(--defcon-1);
+  --color-defcon-5-bg: var(--defcon-5-bg);
+  --color-defcon-4-bg: var(--defcon-4-bg);
+  --color-defcon-3-bg: var(--defcon-3-bg);
+  --color-defcon-2-bg: var(--defcon-2-bg);
+  --color-defcon-1-bg: var(--defcon-1-bg);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
