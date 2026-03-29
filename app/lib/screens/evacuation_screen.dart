@@ -263,7 +263,7 @@ class _EvacuationScreenState extends State<EvacuationScreen> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
         child: Stack(children: [
-          Container(color: const Color(0xFFE8EEF1), child: CustomPaint(size: const Size(double.infinity, 240), painter: _MapPainter(plan: plan))),
+          Container(color: const Color(0xFFE8EEF1), child: CustomPaint(size: const Size(double.infinity, 240), painter: _MapPainter(plan: plan, conflicts: provider.showConflicts ? provider.conflictPoints : []))),
           Positioned(top: 10, left: 10, child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.95), borderRadius: BorderRadius.circular(8), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 4)]),
@@ -285,6 +285,18 @@ class _EvacuationScreenState extends State<EvacuationScreen> {
               const SizedBox(width: 4),
               Text(plan.transport, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white)),
             ]),
+          )),
+          Positioned(bottom: 10, right: 10, child: GestureDetector(
+            onTap: () => provider.toggleConflicts(),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: provider.showConflicts ? AppColors.error : Colors.white.withValues(alpha: 0.9),
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)],
+              ),
+              child: Icon(Icons.security, size: 16, color: provider.showConflicts ? Colors.white : AppColors.textMuted),
+            ),
           )),
         ]),
       ),
@@ -352,7 +364,8 @@ class _EvacuationScreenState extends State<EvacuationScreen> {
 
 class _MapPainter extends CustomPainter {
   final EvacuationPlan plan;
-  _MapPainter({required this.plan});
+  final List<ConflictPoint> conflicts;
+  _MapPainter({required this.plan, this.conflicts = const []});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -382,6 +395,39 @@ class _MapPainter extends CustomPainter {
       canvas.drawCircle(p, isS || isE ? 6 : 3, Paint()..color = isS ? AppColors.success : isE ? AppColors.primary : AppColors.info);
       if (isS || isE) canvas.drawCircle(p, 2.5, Paint()..color = Colors.white);
     }
+
+    // Draw conflicts
+    for (var c in conflicts) {
+      final cp = _getScreenPointForCoord(size, c.lat, c.lng);
+      if (cp != null) {
+        final paint = Paint()..color = AppColors.error..style = PaintingStyle.fill;
+        canvas.drawCircle(cp, 4, paint);
+        canvas.drawCircle(cp, 8, Paint()..color = AppColors.error.withValues(alpha: 0.2)..style = PaintingStyle.fill);
+        
+        // SOS icon-like dot
+        canvas.drawCircle(cp, 2, Paint()..color = Colors.white);
+      }
+    }
+  }
+
+  Offset? _getScreenPointForCoord(Size size, double lat, double lng) {
+    if (plan.waypoints.isEmpty) return null;
+    double minLat = double.infinity, maxLat = -double.infinity, minLng = double.infinity, maxLng = -double.infinity;
+    for (var wp in plan.waypoints) {
+      minLat = math.min(minLat, wp.lat); maxLat = math.max(maxLat, wp.lat);
+      minLng = math.min(minLng, wp.lng); maxLng = math.max(maxLng, wp.lng);
+    }
+    // Add small padding to bounds to include nearby conflicts
+    minLat -= 0.05; maxLat += 0.05; minLng -= 0.05; maxLng += 0.05;
+    
+    const pad = 35.0;
+    final lr = maxLat - minLat; final lgr = maxLng - minLng;
+    final slr = lr == 0 ? 0.1 : lr; final slgr = lgr == 0 ? 0.1 : lgr;
+    
+    return Offset(
+      pad + ((lng - minLng) / slgr) * (size.width - pad * 2),
+      pad + ((maxLat - lat) / slr) * (size.height - pad * 2)
+    );
   }
 
   List<Offset> _getScreenPoints(Size size) {

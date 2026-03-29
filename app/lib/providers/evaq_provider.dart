@@ -3,6 +3,26 @@ import '../models/alert_model.dart';
 import '../models/kit_model.dart';
 import '../utils/i18n.dart';
 
+class ConflictPoint {
+  final String id;
+  final String title;
+  final String type;
+  final double lat;
+  final double lng;
+  final int fatalities;
+  final String date;
+
+  ConflictPoint({
+    required this.id,
+    required this.title,
+    required this.type,
+    required this.lat,
+    required this.lng,
+    required this.fatalities,
+    required this.date,
+  });
+}
+
 class EvaqProvider extends ChangeNotifier {
   bool _isTestMode = true;
   String _testScenarioId = 'societal-collapse';
@@ -50,6 +70,15 @@ class EvaqProvider extends ChangeNotifier {
   List<EvacuationPlan> _evacuationPlans = [];
   List<EvacuationPlan> get evacuationPlans => _evacuationPlans;
 
+  List<ConflictPoint> _conflictPoints = [];
+  List<ConflictPoint> get conflictPoints => _conflictPoints;
+  bool _showConflicts = true;
+  bool get showConflicts => _showConflicts;
+  void toggleConflicts() {
+    _showConflicts = !_showConflicts;
+    notifyListeners();
+  }
+
   int _selectedTab = 0;
   int get selectedTab => _selectedTab;
 
@@ -73,6 +102,16 @@ class EvaqProvider extends ChangeNotifier {
     _loadScenarioAlerts();
     _initKit();
     _initEvacuationPlans();
+    _initConflictPoints();
+  }
+
+  void _initConflictPoints() {
+    _conflictPoints = [
+      ConflictPoint(id: 'ac-1', title: 'Suresnes — Zone Industrielle', type: 'Battles', lat: 48.875, lng: 2.225, fatalities: 2, date: '28/03'),
+      ConflictPoint(id: 'ac-2', title: 'Paris — Porte Maillot', type: 'Riots', lat: 48.878, lng: 2.282, fatalities: 0, date: '29/03'),
+      ConflictPoint(id: 'ac-3', title: 'Nanterre — Préfecture', type: 'Explosions', lat: 48.892, lng: 2.215, fatalities: 5, date: '29/03'),
+      ConflictPoint(id: 'ac-4', title: 'Rueil-Malmaison', type: 'Violence', lat: 48.876, lng: 2.180, fatalities: 1, date: '27/03'),
+    ];
   }
 
   void setLocale(String l) {

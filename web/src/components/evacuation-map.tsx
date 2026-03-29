@@ -12,6 +12,8 @@ import { getSavedPlans, savePlan, deletePlan } from '@/lib/saved-plans'
 import type { SavedPlan } from '@/lib/saved-plans'
 import { fetchRouteStops, getStopIcon } from '@/lib/route-stops'
 import type { RouteStop } from '@/lib/route-stops'
+import { fetchACLEDConflicts, conflictsToGeoJSON } from '@/lib/acled'
+import type { ACLEDConflict } from '@/lib/acled'
 import { useTestMode } from '@/lib/test-mode-context'
 
 function haversineQuick(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -72,6 +74,9 @@ export function EvacuationMap() {
   const [stopsLoading, setStopsLoading] = useState(false)
   const [showStops, setShowStops] = useState(false)
   const stopMarkersRef = useRef<maplibregl.Marker[]>([])
+  const [conflicts, setConflicts] = useState<ACLEDConflict[]>([])
+  const [showConflicts, setShowConflicts] = useState(true)
+  const conflictMarkersRef = useRef<maplibregl.Marker[]>([])
   const { t, locale } = useI18n()
   const { testMode, activeScenario } = useTestMode()
 
@@ -85,6 +90,10 @@ export function EvacuationMap() {
         .limit(200)
       if (data) setAlerts(data as Alert[])
       setLoaded(true)
+
+      // Load ACLED conflicts
+      const acled = await fetchACLEDConflicts()
+      setConflicts(acled)
     }
     load()
   }, [])
@@ -259,6 +268,93 @@ export function EvacuationMap() {
     if (map.isStyleLoaded()) addLayers()
     else map.on('load', addLayers)
   }, [displayAlerts, locale])
+
+  // Add ACLED layers
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !map.isStyleLoaded() || conflicts.length === 0) return
+
+    const addAcledLayers = () => {
+      if (map.getLayer('acled-heatmap')) map.removeLayer('acled-heatmap')
+      if (map.getLayer('acled-point')) map.removeLayer('acled-point')
+      if (map.getSource('acled-conflicts')) map.removeSource('acled-conflicts')
+      
+      for (const m of conflictMarkersRef.current) m.remove()
+      conflictMarkersRef.current = []
+
+      map.addSource('acled-conflicts', {
+        type: 'geojson',
+        data: conflictsToGeoJSON(conflicts),
+      })
+
+      // Heatmap layer for global density
+      map.addLayer({
+        id: 'acled-heatmap',
+        type: 'heatmap',
+        source: 'acled-conflicts',
+        maxzoom: 12,
+        paint: {
+          'heatmap-weight': ['interpolate', ['linear'], ['get', 'fatalities'], 0, 0, 10, 1],
+          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 12, 3],
+          'heatmap-color': [
+            'interpolate', ['linear'], ['heatmap-density'],
+            0, 'rgba(239,68,68,0)', 0.2, 'rgba(239,68,68,0.2)',
+            0.4, 'rgba(239,68,68,0.4)', 0.6, 'rgba(239,68,68,0.7)',
+            0.8, 'rgba(185,28,28,0.8)', 1, 'rgba(153,27,27,0.9)'
+          ],
+          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 12, 20],
+          'heatmap-opacity': showConflicts ? 0.6 : 0,
+        },
+      })
+
+      // Points for high zoom
+      map.addLayer({
+        id: 'acled-point',
+        type: 'circle',
+        source: 'acled-conflicts',
+        minzoom: 8,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 3, 16, 10],
+          'circle-color': ['get', 'color'],
+          'circle-stroke-color': 'white',
+          'circle-stroke-width': 1,
+          'circle-opacity': showConflicts ? 0.8 : 0,
+          'circle-stroke-opacity': showConflicts ? 0.8 : 0,
+        },
+      })
+
+      // Interactive markers for details
+      if (showConflicts) {
+        for (const c of conflicts) {
+          const el = document.createElement('div')
+          el.className = 'acled-marker'
+          el.style.width = '12px'
+          el.style.height = '12px'
+          el.style.backgroundColor = 'transparent'
+          el.style.cursor = 'pointer'
+
+          const popup = new maplibregl.Popup({ offset: 10, maxWidth: '240px' })
+            .setHTML(`
+              <div style="font-size:12px;padding:4px;">
+                <div style="font-weight:700;margin-bottom:4px;color:#ef4444;">🚨 ${c.event_type.toUpperCase()}</div>
+                <div style="font-size:11px;font-weight:600;margin-bottom:2px;">${c.location}</div>
+                <div style="font-size:10px;color:#666;margin-bottom:6px;">${c.actor1} · ${c.event_date}</div>
+                <div style="font-size:11px;line-height:1.4;">${c.notes}</div>
+                <div style="margin-top:6px;font-weight:700;color:#111;font-size:9px;text-transform:uppercase;letter-spacing:0.5px;">Fatalités: ${c.fatalities}</div>
+              </div>
+            `)
+
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([c.longitude, c.latitude])
+            .setPopup(popup)
+            .addTo(map)
+          conflictMarkersRef.current.push(marker)
+        }
+      }
+    }
+
+    addAcledLayers()
+  }, [conflicts, showConflicts])
 
   // Handle map clicks for destination selection
   useEffect(() => {
@@ -597,6 +693,19 @@ export function EvacuationMap() {
                 )}
 
                 <p className="text-xs text-muted">{t('plan.calculate_desc_short')}</p>
+
+                {/* ACLED Conflict Toggle */}
+                <button
+                  onClick={() => setShowConflicts(!showConflicts)}
+                  className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
+                    showConflicts 
+                      ? 'bg-red-500/5 border-red-500/20 text-red-600' 
+                      : 'bg-surface border-border text-muted hover:text-foreground'
+                  }`}
+                >
+                  <div className={`h-2 w-2 rounded-full ${showConflicts ? 'bg-red-500 animate-pulse' : 'bg-muted'}`} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Zones de conflit (ACLED)</span>
+                </button>
 
                 {/* Smart evacuate button */}
                 {evacAdvice && evacAdvice.suggested_bearing_deg !== null && (
